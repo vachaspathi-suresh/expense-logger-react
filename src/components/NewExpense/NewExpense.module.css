@@ -1,0 +1,31 @@
+.newExpense {
+  background-color: #963a0c;
+  padding: 1rem;
+  margin: 2rem auto;
+  width: 50rem;
+  max-width: 95%;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
+}
+
+.newExpenseEdit {
+  background-color: #ffbc80;
+}
+
+.newExpense button {
+  font: inherit;
+  cursor: pointer;
+  padding: 1rem 2rem;
+  border: 1px solid #f76e11;
+  background-color: #f76e11;
+  color: white;
+  border-radius: 12px;
+  margin-right: 1rem;
+}
+
+.newExpense button:hover,
+.newExpense button:active {
+  border-color: #e05f08;
+  background-color: #e05f08;
+}
