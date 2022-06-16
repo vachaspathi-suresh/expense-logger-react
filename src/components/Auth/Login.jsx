@@ -26,6 +26,7 @@ import {
 import { set, ref } from "firebase/database";
 
 import useInput from "../../hooks/use-input";
+import useHelperText from "../../hooks/use-helper-text";
 import { auth, db } from "../../firebase";
 
 const Login = () => {
@@ -73,6 +74,20 @@ const Login = () => {
     onBlurHandler: lnBlurHandler,
   } = useInput((value) => value.trim() !== "");
 
+  const {
+    value: emailHelper,
+    show: emailHelperShow,
+    valueChangeHandler: setEmailHelper,
+    showHelper: setEmailHelperShow,
+  } = useHelperText();
+
+  const {
+    value: passHelper,
+    show: passHelperShow,
+    valueChangeHandler: setPassHelper,
+    showHelper: setPassHelperShow,
+  } = useHelperText();
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -103,7 +118,37 @@ const Login = () => {
             navigate("/expenses");
           })
           .catch((error) => {
-            console.log(error.code + " --- " + error.message);
+            switch (error.code) {
+              case "auth/invalid-email": {
+                setEmailHelperShow(true);
+                setEmailHelper("Invalid email id!!");
+                break;
+              }
+              case "auth/user-disabled": {
+                setEmailHelperShow(true);
+                setPassHelperShow(true);
+                setEmailHelper("");
+                setPassHelper("Your account has been Blocked!!");
+                break;
+              }
+              case "auth/user-not-found": {
+                setEmailHelperShow(true);
+                setEmailHelper("User not found!!");
+                break;
+              }
+              case "auth/wrong-password": {
+                setPassHelperShow(true);
+                setPassHelper("Wrong Password!!");
+                break;
+              }
+              default: {
+                setEmailHelperShow(true);
+                setPassHelperShow(true);
+                setEmailHelper("");
+                setPassHelper(error.code);
+                break;
+              }
+            }
           });
       } catch (error) {
         console.log(error.code);
@@ -122,8 +167,52 @@ const Login = () => {
           navigate("/expenses");
         })
         .catch((error) => {
-          console.log(error.code);
+          switch (error.code) {
+            case "auth/email-already-in-use": {
+              setEmailHelperShow(true);
+              setEmailHelper("Already Email in use!!");
+              break;
+            }
+            case "auth/operation-not-allowed": {
+              setEmailHelperShow(true);
+              setPassHelperShow(true);
+              setEmailHelper("");
+              setPassHelper("Sorry unable to Signin now!!");
+              break;
+            }
+            case "auth/invalid-email": {
+              setEmailHelperShow(true);
+              setEmailHelper("Invalid Email!!");
+              break;
+            }
+            case "auth/weak-password": {
+              setPassHelperShow(true);
+              setPassHelper("Password should contain at least 8 characters!!");
+              break;
+            }
+            default: {
+              setEmailHelperShow(true);
+              setPassHelperShow(true);
+              setEmailHelper("");
+              setPassHelper(error.code);
+              break;
+            }
+          }
         });
+    }
+  };
+
+  const onEmailChange = (event) => {
+    emailChangeHandler(event);
+    if (emailHelperShow) {
+      setEmailHelperShow(false);
+    }
+  };
+
+  const onPassChange = (event) => {
+    passChangeHandler(event);
+    if (passHelperShow) {
+      setPassHelperShow(false);
     }
   };
 
@@ -193,10 +282,13 @@ const Login = () => {
             name="email"
             margin="normal"
             value={emailValue}
-            onChange={emailChangeHandler}
+            onChange={onEmailChange}
             onBlur={emailBlurHandler}
-            error={emailHasError}
-            helperText={emailHasError && "Enter Valid Email Address"}
+            error={emailHasError || emailHelperShow}
+            helperText={
+              (emailHasError && "Enter Valid Email Address") ||
+              (emailHelperShow && emailHelper)
+            }
           />
           <TextField
             label="Password"
@@ -208,11 +300,13 @@ const Login = () => {
             name="password"
             margin="normal"
             value={passValue}
-            onChange={passChangeHandler}
+            onChange={onPassChange}
             onBlur={passBlurHandler}
-            error={passHasError}
+            error={passHasError || passHelperShow}
             helperText={
-              passHasError && "Password should contain at least 8 characters"
+              (passHasError &&
+                "Password should contain at least 8 characters") ||
+              (passHelperShow && passHelper)
             }
             InputProps={{
               endAdornment: (
@@ -251,7 +345,13 @@ const Login = () => {
           {isSignin ? (
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
+                <Link
+                  component="button"
+                  onClick={() => {
+                    navigate("/auth/forget-password");
+                  }}
+                  variant="body2"
+                >
                   Forget Password?
                 </Link>
               </Grid>
