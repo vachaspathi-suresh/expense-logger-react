@@ -3,16 +3,16 @@ import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAPruzEc5jqtPdhMl_mIBqR8f4C9UBcuAs",
-  authDomain: "expense-logger-bddb0.firebaseapp.com",
-  databaseURL:
-    "https://expense-logger-bddb0-default-rtdb.asia-southeast1.firebasedatabase.app",
+  apiKey: process.env.FIREBASEAPIKEY,
+  authDomain: process.env.FIREBASEAUTHDOMAIN,
+  databaseURL: process.env.FIREBASEDATABASEURL,
   projectId: "expense-logger-bddb0",
   storageBucket: "expense-logger-bddb0.appspot.com",
-  messagingSenderId: "490408012724",
-  appId: "1:490408012724:web:34dcf9efacb8a7c02920e1",
-  measurementId: "G-L0S5HVMJ65",
+  messagingSenderId: process.env.FIREBASEMESSAGINGSENDERID,
+  appId: process.env.FIREBASEAPPID,
+  measurementId: process.env.FIREBASEMESUREMENTID,
 };
+console.log(process.env.FIREBASEAPIKEY);
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
